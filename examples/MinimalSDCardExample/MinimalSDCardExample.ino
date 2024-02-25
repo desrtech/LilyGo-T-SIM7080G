@@ -186,6 +186,8 @@ void setup()
     //Start while waiting for Serial monitoring
     while (!Serial);
 
+    Serial.println("Inicia SD CARD TEST");
+
     delay(3000);
 
     Serial.println();
@@ -214,9 +216,12 @@ void setup()
 
     SD_MMC.setPins(SDMMC_CLK, SDMMC_CMD, SDMMC_DATA);   //set sdcard pin use 1-bit mode
 
-    if (!SD_MMC.begin("/sdcard", true)) {
+    bool SD_CARD = SD_MMC.begin("/sdcard", true);
+
+    if (!SD_CARD) {
         Serial.println("Card Mount Failed");
-        while (1) {
+        SD_CARD = SD_MMC.begin("/sdcard", true, true);
+        while (!SD_CARD) {
             delay(1000);
         }
 
@@ -230,7 +235,7 @@ void setup()
         }
     }
 
-    Serial.print("SD_MMC Card Type: ");
+    Serial.print("SD_MMC Card Type: " + cardType);
     if (cardType == CARD_MMC) {
         Serial.println("MMC");
     } else if (cardType == CARD_SD) {

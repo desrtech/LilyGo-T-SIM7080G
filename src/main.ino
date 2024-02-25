@@ -1,5 +1,5 @@
 #include  <Arduino.h>
-#include <WiFiManager/WiFiManager.h>
+#include <../lib/WiFiManager/WiFiManager.h>
 
 #define XPOWERS_CHIP_AXP2101
 #include <../lib/XPowersLib/src/XPowersLib.h>
