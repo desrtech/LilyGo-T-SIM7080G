@@ -6,7 +6,9 @@
 XPowersPMU PMU;
 
 bool pmu_flag = false;
+bool led_state = false;
 uint32_t loopMillis;
+uint32_t loopMillis2;
 
 void setFlag(void) {
     pmu_flag = true;
@@ -113,10 +115,21 @@ void iniciaXPowers() {
         break;
     }
 
-    PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_1HZ);
+    // PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
 }
 
 void pmuCharging() {
+
+    if (millis() - loopMillis2 > 300) {
+        if (led_state) {
+            PMU.setChargingLedMode(XPOWERS_CHG_LED_ON);
+        } else {
+            PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+        }
+        loopMillis2 = millis();
+        led_state = !led_state;
+    }
+
     if (pmu_flag) {
 
         pmu_flag = false;
@@ -152,7 +165,7 @@ void pmuCharging() {
     }
 
 
-    if (millis() - loopMillis > 1000) {
+    if (millis() - loopMillis > 3000) {
         Serial.print("isCharging:"); Serial.println(PMU.isCharging() ? "YES" : "NO");
         Serial.print("isVbusIn:"); Serial.println(PMU.isVbusIn() ? "YES" : "NO");
         Serial.print("getBattVoltage:"); Serial.print(PMU.getBattVoltage()); Serial.println("mV");

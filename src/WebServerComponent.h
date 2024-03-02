@@ -1,11 +1,11 @@
-// #include <WiFi.h>
-// #include <ESPAsyncWebServer.h>
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
 
-// AsyncWebServer server(8090);
+AsyncWebServer server(8090);
 
 
 // void responderPeticion() {
-//     return server.send(200, "text/html", respuesta);
+    // return server.send(200, "text/html", respuesta);
 // }
 
 // void iniciaWebServer() {
