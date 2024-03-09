@@ -7,6 +7,7 @@ XPowersPMU PMU;
 
 bool pmu_flag = false;
 bool led_state = false;
+
 uint32_t loopMillis;
 uint32_t loopMillis2;
 
@@ -20,7 +21,7 @@ void iniciaXPowers() {
     Serial.println();
     bool resPmu;
     resPmu = PMU.begin(Wire1, AXP2101_SLAVE_ADDRESS, I2C_SDA, I2C_SCL);
-    Serial.println(resPmu);
+    // Serial.println(resPmu);
 
 
     if(!resPmu) {
@@ -115,21 +116,10 @@ void iniciaXPowers() {
         break;
     }
 
-    // PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+    // PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_4HZ);
 }
 
-void pmuCharging() {
-
-    if (millis() - loopMillis2 > 300) {
-        if (led_state) {
-            PMU.setChargingLedMode(XPOWERS_CHG_LED_ON);
-        } else {
-            PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
-        }
-        loopMillis2 = millis();
-        led_state = !led_state;
-    }
-
+void irqStatus() {
     if (pmu_flag) {
 
         pmu_flag = false;
@@ -161,9 +151,59 @@ void pmuCharging() {
 
         // Clear PMU Interrupt Status Register
         PMU.clearIrqStatus();
-
     }
+}
 
+void powerStatus() {
+    Serial.print("isCharging:"); Serial.println(PMU.isCharging() ? "YES" : "NO");
+    Serial.print("isVbusIn:"); Serial.println(PMU.isVbusIn() ? "YES" : "NO");
+    Serial.print("getBattVoltage:"); Serial.print(PMU.getBattVoltage()); Serial.println("mV");
+    Serial.print("getVbusVoltage:"); Serial.print(PMU.getVbusVoltage()); Serial.println("mV");
+    Serial.print("getSystemVoltage:"); Serial.print(PMU.getSystemVoltage()); Serial.println("mV");
+
+    // The battery percentage may be inaccurate at first use, the PMU will automatically
+    // learn the battery curve and will automatically calibrate the battery percentage
+    // after a charge and discharge cycle
+    if (PMU.isBatteryConnect()) {
+        Serial.print("getBatteryPercent:"); Serial.print(PMU.getBatteryPercent()); Serial.println("%");
+    }
+    Serial.println();
+    loopMillis = millis();
+}
+
+void pmuCharging() {
+    if (pmu_flag) {
+
+        pmu_flag = false;
+
+        // Get PMU Interrupt Status Register
+        uint32_t status = PMU.getIrqStatus();
+
+        if (PMU.isVbusInsertIrq()) {
+            Serial.println("isVbusInsert");
+        }
+        if (PMU.isVbusRemoveIrq()) {
+            Serial.println("isVbusRemove");
+        }
+        if (PMU.isBatInsertIrq()) {
+            Serial.println("isBatInsert");
+        }
+        if (PMU.isBatRemoveIrq()) {
+            Serial.println("isBatRemove");
+        }
+        if (PMU.isPekeyShortPressIrq()) {
+            Serial.println("isPekeyShortPress");
+        }
+        if (PMU.isPekeyLongPressIrq()) {
+            Serial.println("isPekeyLongPress");
+        }
+
+        // For more interrupt sources, please check XPowersLib
+
+
+        // Clear PMU Interrupt Status Register
+        PMU.clearIrqStatus();
+    }
 
     if (millis() - loopMillis > 3000) {
         Serial.print("isCharging:"); Serial.println(PMU.isCharging() ? "YES" : "NO");
