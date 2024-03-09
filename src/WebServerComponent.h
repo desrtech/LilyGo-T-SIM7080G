@@ -5,3 +5,6 @@
 AsyncWebServer server(8090);
 WebSocketServer webSocket();
 
+void iniciaWebServer() {
+    
+}
