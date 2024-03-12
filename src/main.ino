@@ -3,7 +3,7 @@
 // #include <utilities.h>
 #include <PMUService.h>
 #include <WiFiConnection.h>
-// #include <WebServerComponent.h>
+#include <WebServerComponent.h>
 
 Ticker chargeLedBlinkTimer;
 Ticker chargerIrqStatusTimer;
@@ -16,12 +16,16 @@ void setup()
     while (!Serial);
     delay(3000);
     Serial.println("Serial connected");
+
     iniciaXPowers();
     PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_1HZ);
-    chargerIrqStatusTimer.attach(5, irqStatus);
-    powerStatusTimer.attach(5, powerStatus);
+    chargerIrqStatusTimer.attach(1, irqStatus);
+    powerStatusTimer.attach(10, powerStatus);
+
     iniciaWifiManager();
     ipAddressTimer.attach(5, ipAddress);
+
+    iniciaWebServer();
 }
 
 void loop()
