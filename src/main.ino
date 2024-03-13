@@ -24,7 +24,7 @@ void setup()
 
     iniciaWifiManager();
     ipAddressTimer.attach(5, ipAddress);
-
+    while(!resWm);
     iniciaWebServer();
 }
 

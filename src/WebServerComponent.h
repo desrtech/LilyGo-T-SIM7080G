@@ -34,12 +34,8 @@ void iniciaWebServer() {
         request->send(SPIFFS, "/css/styles.css", "text/css");
     });
 
-    server.on("/js/raphael-2.1.4.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/js/raphael-2.1.4.min.js", "text/js");
-    });
-
-    server.on("/js/justgage.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/js/justgage.js", "text/js");
+    server.on("/img/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/img/favicon.ico", "image/x-icon");
     });
 
     server.onNotFound(notFound);
