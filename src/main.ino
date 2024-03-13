@@ -26,6 +26,13 @@ void setup()
     ipAddressTimer.attach(5, ipAddress);
     while(!resWm);
     iniciaWebServer();
+
+    server.on("/dataJson", HTTP_GET, [](AsyncWebServerRequest *request) {
+        String json = getJsonData(String(PMU.getSystemVoltage()));
+        request->send(200, "application/json", json);
+        json = String();
+    });
+
 }
 
 void loop()
