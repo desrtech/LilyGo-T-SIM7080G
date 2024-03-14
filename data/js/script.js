@@ -2,9 +2,14 @@ console.log("Carga script");
 
 document.addEventListener("DOMContentLoaded", generaSystemVoltage);
 
+// // Get current sensor readings when the page loads  
+// window.addEventListener('load', getReadings);
+
+var systemVoltageGauge;
+
 function generaSystemVoltage() {
     // Create Humidity Gauge
-    var gaugeHum = new RadialGauge({
+    systemVoltageGauge = new RadialGauge({
         renderTo: 'system-voltage',
         value: 3295,
         width: 250,
@@ -52,4 +57,30 @@ function generaSystemVoltage() {
         animationDuration: 1500,
         animationRule: "linear"
     }).draw();
+    getReadings();
 };
+
+// Function to get current readings on the webpage when it loads for the first time
+function getReadings(){
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        var myObj = JSON.parse(this.responseText);
+        console.log(myObj);
+        var systemVoltage = myObj.systemVoltage;
+        systemVoltageGauge.value = systemVoltage;
+        // var hum = myObj.humidity;
+        // gaugeTemp.value = temp;
+        // gaugeHum.value = hum;
+      }
+    }; 
+    xhr.open("GET", "/dataJson", true);
+    xhr.send();
+  }
+
+
+if (!!window.EventSource) {
+    var source = new EventSource("/events");
+    
+    source.addEventListener("/open")
+}

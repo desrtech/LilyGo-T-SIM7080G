@@ -20,10 +20,10 @@ void setup()
     iniciaXPowers();
     PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_1HZ);
     chargerIrqStatusTimer.attach(1, irqStatus);
-    powerStatusTimer.attach(10, powerStatus);
+    powerStatusTimer.attach(30, powerStatus);
 
     iniciaWifiManager();
-    ipAddressTimer.attach(5, ipAddress);
+    ipAddressTimer.attach(30, ipAddress);
     while(!resWm);
     iniciaWebServer();
 

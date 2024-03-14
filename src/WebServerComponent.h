@@ -9,6 +9,9 @@ WebSocketsServer webSockets(81);
 
 JSONVar dataJson;
 
+// Create an Event Source on /events
+AsyncEventSource events("/events");
+
 void notFound(AsyncWebServerRequest *request) {
     request->send(404, "plain/text", "Pagina no encontrada");
 }
@@ -40,6 +43,8 @@ void iniciaWebServer() {
             request->send(SPIFFS, "/index.html", "text/html");
     });
 
+    server.serveStatic("/", SPIFFS, "/");
+
     server.on("/css/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/css/styles.css", "text/css");
     });
@@ -58,8 +63,15 @@ void iniciaWebServer() {
     //     json = String();
     // });
 
+    server.addHandler(&events);
+
     server.onNotFound(notFound);
     server.begin();
+}
+
+void loopGetDataJson(String systemVoltage) {
+    events.send("ping", NULL, millis());
+    // events.send(getJsonData(systemVoltage).c_str(), "new_reading", millis());
 }
 
 
