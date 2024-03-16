@@ -9,6 +9,10 @@ WebSocketsServer webSockets(81);
 
 JSONVar dataJson;
 
+// Timer variables
+unsigned long lastTime = 0;
+unsigned long timerDelay = 10000;
+
 // Create an Event Source on /events
 AsyncEventSource events("/events");
 
@@ -18,7 +22,6 @@ void notFound(AsyncWebServerRequest *request) {
 
 String getJsonData(String systemVoltage) {
     dataJson["systemVoltage"] = String(systemVoltage);
-
     String json = JSON.stringify(dataJson);
     return json;
 }
@@ -63,6 +66,15 @@ void iniciaWebServer() {
     //     json = String();
     // });
 
+    events.onConnect([](AsyncEventSourceClient *client){
+        if(client->lastId()){
+            Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+        }
+        // send event with message "hello!", id current millis
+        // and set reconnect delay to 1 second
+        client->send("hello!", NULL, millis(), 10000);
+    });
+
     server.addHandler(&events);
 
     server.onNotFound(notFound);
@@ -70,9 +82,12 @@ void iniciaWebServer() {
 }
 
 void loopGetDataJson(String systemVoltage) {
-    events.send("ping", NULL, millis());
-    // events.send(getJsonData(systemVoltage).c_str(), "new_reading", millis());
+    if ((millis() - lastTime) > timerDelay) {
+        Serial.print("Envía datos cada 10s: ");
+        Serial.println(getJsonData(systemVoltage).c_str());
+        // events.send("ping", NULL, millis());
+        events.send(getJsonData(systemVoltage).c_str(),"new_reading" ,millis());
+        lastTime = millis();
+    }
 }
-
-
 

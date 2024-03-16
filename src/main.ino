@@ -37,5 +37,5 @@ void setup()
 
 void loop()
 {
-    
+    loopGetDataJson(String(PMU.getSystemVoltage()));
 }
