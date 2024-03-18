@@ -31,6 +31,8 @@ void iniciaXPowers() {
         }
     }
 
+    PMU.setChargingLedMode(XPOWERS_CHG_LED_ON);
+
     int sda = 13;
     int scl = 21;
     Wire.begin(sda, scl);
@@ -52,6 +54,8 @@ void iniciaXPowers() {
 
     pinMode(PMU_INPUT_PIN, INPUT);
     attachInterrupt(PMU_INPUT_PIN, setFlag, FALLING);
+
+    
 
     // Disable all interrupts
     PMU.disableIRQ(XPOWERS_AXP2101_ALL_IRQ);
@@ -155,11 +159,11 @@ void irqStatus() {
 }
 
 void powerStatus() {
-    Serial.print("isCharging:"); Serial.println(PMU.isCharging() ? "YES" : "NO");
-    Serial.print("isVbusIn:"); Serial.println(PMU.isVbusIn() ? "YES" : "NO");
-    Serial.print("getBattVoltage:"); Serial.print(PMU.getBattVoltage()); Serial.println("mV");
-    Serial.print("getVbusVoltage:"); Serial.print(PMU.getVbusVoltage()); Serial.println("mV");
-    Serial.print("getSystemVoltage:"); Serial.print(PMU.getSystemVoltage()); Serial.println("mV");
+    Serial.print("Charging:"); Serial.print(PMU.isCharging() ? "YES" : "NO");
+        Serial.print(" VBus Connected: "); Serial.print(PMU.isVbusIn() ? "YES" : "NO");
+        Serial.print(" Batt Voltage: "); Serial.print(PMU.getBattVoltage()); Serial.print("mV");
+        Serial.print(" VBuss Voltage: "); Serial.print(PMU.getVbusVoltage()); Serial.print("mV");
+        Serial.print(" System Voltage: "); Serial.print(PMU.getSystemVoltage()); Serial.print("mV");
 
     // The battery percentage may be inaccurate at first use, the PMU will automatically
     // learn the battery curve and will automatically calibrate the battery percentage
@@ -206,11 +210,11 @@ void pmuCharging() {
     }
 
     if (millis() - loopMillis > 3000) {
-        Serial.print("isCharging:"); Serial.println(PMU.isCharging() ? "YES" : "NO");
-        Serial.print("isVbusIn:"); Serial.println(PMU.isVbusIn() ? "YES" : "NO");
-        Serial.print("getBattVoltage:"); Serial.print(PMU.getBattVoltage()); Serial.println("mV");
-        Serial.print("getVbusVoltage:"); Serial.print(PMU.getVbusVoltage()); Serial.println("mV");
-        Serial.print("getSystemVoltage:"); Serial.print(PMU.getSystemVoltage()); Serial.println("mV");
+        Serial.print("Charging:"); Serial.print(PMU.isCharging() ? "YES" : "NO");
+        Serial.print(" VBus Connected: "); Serial.print(PMU.isVbusIn() ? "YES" : "NO");
+        Serial.print(" Batt Voltage: "); Serial.print(PMU.getBattVoltage()); Serial.print("mV");
+        Serial.print(" VBuss Voltage: "); Serial.print(PMU.getVbusVoltage()); Serial.print("mV");
+        Serial.print(" System Voltage: "); Serial.print(PMU.getSystemVoltage()); Serial.print("mV");
 
         // The battery percentage may be inaccurate at first use, the PMU will automatically
         // learn the battery curve and will automatically calibrate the battery percentage

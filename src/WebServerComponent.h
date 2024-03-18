@@ -20,8 +20,9 @@ void notFound(AsyncWebServerRequest *request) {
     request->send(404, "plain/text", "Pagina no encontrada");
 }
 
-String getJsonData(String systemVoltage) {
-    dataJson["systemVoltage"] = String(systemVoltage);
+String getJsonData(String systemVoltage, String bateryVoltage) {
+    dataJson["systemVoltage"] = systemVoltage;
+    dataJson["bateryVoltage"] = bateryVoltage;
     String json = JSON.stringify(dataJson);
     return json;
 }
@@ -60,12 +61,6 @@ void iniciaWebServer() {
         request->send(SPIFFS, "/img/favicon.ico", "image/x-icon");
     });
 
-    // server.on("/dataJson", HTTP_GET, [](AsyncWebServerRequest *request) {
-    //     String json = getJsonData();
-    //     request->send(200, "application/json", json);
-    //     json = String();
-    // });
-
     events.onConnect([](AsyncEventSourceClient *client){
         if(client->lastId()){
             Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
@@ -81,12 +76,10 @@ void iniciaWebServer() {
     server.begin();
 }
 
-void loopGetDataJson(String systemVoltage) {
-    if ((millis() - lastTime) > timerDelay) {
-        Serial.print("Envía datos cada 10s: ");
-        Serial.println(getJsonData(systemVoltage).c_str());
+void loopGetDataJson(String systemVoltage, String bateryVoltage) {
+    if ((millis() - lastTime) > 3000) {
         // events.send("ping", NULL, millis());
-        events.send(getJsonData(systemVoltage).c_str(),"new_reading" ,millis());
+        events.send(getJsonData(systemVoltage, bateryVoltage).c_str(), "new_readings" ,millis());
         lastTime = millis();
     }
 }

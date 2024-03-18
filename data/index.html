@@ -17,8 +17,13 @@
     <body>
         <div class=".container-fluid">
             <div class="col-md-12">
-                <div>
-                    <h1 id="title"> SERVIDOR WEB ESP32 </h1>
+                <div class="row">
+                    <div class="col-md-6 text-left">
+                        <h1 id="title"> SERVIDOR WEB ESP32 </h1>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <h6>Ip address: <input type="text" value="ippppp"></h6>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -35,8 +40,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-12 text-center">
+                        <div class="col-md-6 text-center">
+                            <label for="system-voltage">System Voltage</label>
                             <canvas id="system-voltage"></canvas>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <label for="batt-voltage">Batt Voltage</label>
+                            <canvas id="batt-voltage"></canvas>
                         </div>
                     </div>
                 </div>

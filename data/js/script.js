@@ -6,56 +6,82 @@ document.addEventListener("DOMContentLoaded", generaSystemVoltage);
 // window.addEventListener('load', getReadings);
 
 var systemVoltageGauge;
+var battVoltageGauge
 
 function generaSystemVoltage() {
-    // Create Humidity Gauge
+  // Create Humidity Gauge
     systemVoltageGauge = new RadialGauge({
         renderTo: 'system-voltage',
-        value: 3295,
-        width: 250,
-        height: 250,
-        units: "System Voltage (mv)",
-        minValue: 0,
-        maxValue: 8000,
-        colorValueBoxRect: "#049faa",
-        colorValueBoxRectEnd: "#049faa",
-        colorValueBoxBackground: "#f1fbfc",
-        valueInt: 2,
+        width: 200,
+        height: 200,
+        value: 4.4,
+        units: "V",
+        minValue: 4.000,
+        startAngle: 90,
+        ticksAngle: 90,
+        valueBox: true,
+        maxValue: 6.000,
+        valueInt: 1,
+        valueDec: 2,
         majorTicks: [
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8"    
+            "4.0",
+            "5.0",
+            "6.0"
         ],
         minorTicks: 10,
         strokeTicks: true,
         highlights: [
-            {"from": 0, "to": 1999, "color": "#FF0000"},
-            {"from": 2000, "to": 2999, "color": "#FFA500"},
-            {"from": 3000, "to": 3299, "color": "#F0E68C"},
-            {"from": 3300, "to": 4400, "color": "#03C0C1"},
-            {"from": 4400, "to": 4699, "color": "#F0E68C"},
-            {"from": 4700, "to": 5999, "color": "#FFA500"},
-            {"from": 6000, "to": 8000, "color": "#FF0000"}
+            {"from": 4.000, "to": 4.599, "color": "#eeffb9"},
+            {"from": 4.600, "to": 5.400, "color": "#a1fd54"},
+            {"from": 5.401, "to": 6.000, "color": "#eeffb9"},
         ],
         colorPlate: "#fff",
         borderShadowWidth: 0,
         borders: false,
-        needleType: "line",
-        colorNeedle: "#007F80",
-        colorNeedleEnd: "#007F80",
+        needleType: "arrow",
         needleWidth: 2,
-        needleCircleSize: 3,
-        colorNeedleCircleOuter: "#007F80",
+        needleCircleSize: 7,
         needleCircleOuter: true,
         needleCircleInner: false,
         animationDuration: 1500,
-        animationRule: "linear"
+        animationRule: "linear" 
+    }).draw();
+
+    battVoltageGauge = new RadialGauge({
+        renderTo: 'batt-voltage',
+        width: 200,
+        height: 200,
+        value: 3.3,
+        units: "V",
+        minValue: 3,
+        startAngle: 90,
+        ticksAngle: 90,
+        valueBox: true,
+        valueInt: 1,
+        valueDec: 2,
+        maxValue: 5,
+        majorTicks: [
+            "3.0",
+            "4.0",
+            "5.0"
+        ],
+        minorTicks: 10,
+        strokeTicks: true,
+        highlights: [
+            {"from": 3.000, "to": 3.599, "color": "#eeffb9"},
+            {"from": 3.600, "to": 4.400, "color": "#a1fd54"},
+            {"from": 4.401, "to": 5.000, "color": "#eeffb9"},
+        ],
+        colorPlate: "#fff",
+        borderShadowWidth: 0,
+        borders: false,
+        needleType: "arrow",
+        needleWidth: 2,
+        needleCircleSize: 7,
+        needleCircleOuter: true,
+        needleCircleInner: false,
+        animationDuration: 1500,
+        animationRule: "linear" 
     }).draw();
     getReadings();
 };
@@ -67,7 +93,9 @@ function getReadings(){
       if (this.readyState == 4 && this.status == 200) {
         var myObj = JSON.parse(this.responseText);
         var systemVoltage = myObj.systemVoltage;
-        systemVoltageGauge.value = systemVoltage;
+        var battVoltage = myObj.bateryVoltage;
+        systemVoltageGauge.value = systemVoltage / 1000;
+        battVoltageGauge.value = battVoltage / 1000;
       }
     }; 
     xhr.open("GET", "/dataJson", true);
@@ -98,9 +126,8 @@ if (!!window.EventSource) {
   }, false);
 
   source.addEventListener("new_readings", function(e) {
-    console.log("new_readings", e.data);
     var myObj = JSON.parse(e.data);
-    console.log(myObj);
-    systemVoltageGauge.value = myObj.systemVoltage;
+    systemVoltageGauge.value = myObj.systemVoltage/1000;
+    battVoltageGauge.value = myObj.bateryVoltage/1000;
   }, false);
 }

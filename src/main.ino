@@ -18,7 +18,7 @@ void setup()
     Serial.println("Serial connected");
 
     iniciaXPowers();
-    PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_1HZ);
+    
     chargerIrqStatusTimer.attach(1, irqStatus);
     powerStatusTimer.attach(30, powerStatus);
 
@@ -28,14 +28,14 @@ void setup()
     iniciaWebServer();
 
     server.on("/dataJson", HTTP_GET, [](AsyncWebServerRequest *request) {
-        String json = getJsonData(String(PMU.getSystemVoltage()));
+        String json = getJsonData(String(PMU.getSystemVoltage()), String(PMU.getBattVoltage()));
         request->send(200, "application/json", json);
         json = String();
     });
-
+    PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_4HZ);
 }
 
 void loop()
 {
-    loopGetDataJson(String(PMU.getSystemVoltage()));
+    loopGetDataJson(String(PMU.getSystemVoltage()), String(PMU.getBattVoltage()));
 }
