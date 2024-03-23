@@ -5,7 +5,7 @@
 #include <Arduino_JSON.h>
 
 AsyncWebServer server(8090);
-WebSocketsServer webSockets(81);
+AsyncWebSocket ws("/ws");
 
 JSONVar dataJson;
 
@@ -16,14 +16,38 @@ unsigned long timerDelay = 10000;
 // Create an Event Source on /events
 AsyncEventSource events("/events");
 
-void notFound(AsyncWebServerRequest *request) {
-    request->send(404, "plain/text", "Pagina no encontrada");
+void notifyClients() {
+    ws.textAll(JSON.stringify(dataJson));
 }
 
-String getJsonData(String systemVoltage) {
-    dataJson["systemVoltage"] = String(systemVoltage);
-    String json = JSON.stringify(dataJson);
-    return json;
+void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
+ void *arg, uint8_t *data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      break;
+    case WS_EVT_DATA:
+        Serial.println("Recibiendo datos desde web");
+    //   handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
+}
+
+void initWebSocket() {
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+}
+
+
+
+void notFound(AsyncWebServerRequest *request) {
+    request->send(404, "plain/text", "Pagina no encontrada");
 }
 
 void iniciaWebServer() {
@@ -66,28 +90,28 @@ void iniciaWebServer() {
     //     json = String();
     // });
 
-    events.onConnect([](AsyncEventSourceClient *client){
-        if(client->lastId()){
-            Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-        }
-        // send event with message "hello!", id current millis
-        // and set reconnect delay to 1 second
-        client->send("hello!", NULL, millis(), 10000);
-    });
+    // events.onConnect([](AsyncEventSourceClient *client){
+    //     if(client->lastId()){
+    //         Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+    //     }
+    //     // send event with message "hello!", id current millis
+    //     // and set reconnect delay to 1 second
+    //     client->send("hello!", NULL, millis(), 10000);
+    // });
 
-    server.addHandler(&events);
+    // server.addHandler(&events);
 
     server.onNotFound(notFound);
     server.begin();
 }
 
-void loopGetDataJson(String systemVoltage) {
-    if ((millis() - lastTime) > timerDelay) {
-        Serial.print("Envía datos cada 10s: ");
-        Serial.println(getJsonData(systemVoltage).c_str());
-        // events.send("ping", NULL, millis());
-        events.send(getJsonData(systemVoltage).c_str(),"new_reading" ,millis());
-        lastTime = millis();
-    }
-}
+// void loopGetDataJson(String systemVoltage) {
+//     if ((millis() - lastTime) > timerDelay) {
+//         Serial.print("Envía datos cada 10s: ");
+//         Serial.println(getJsonData(systemVoltage).c_str());
+//         // events.send("ping", NULL, millis());
+//         events.send(getJsonData(systemVoltage).c_str(),"new_reading" ,millis());
+//         lastTime = millis();
+//     }
+// }
 

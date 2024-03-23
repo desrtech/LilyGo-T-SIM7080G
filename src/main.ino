@@ -10,6 +10,13 @@ Ticker chargerIrqStatusTimer;
 Ticker powerStatusTimer;
 Ticker ipAddressTimer;
 
+
+void iniciaValores() {
+    dataJson["system_voltage"] = PMU.getSystemVoltage();
+    dataJson["batt_Voltage"] = PMU.getBattVoltage();
+    dataJson["ip_address"] = wf.localIP();
+}
+
 void setup()
 {
     Serial.begin(115200);
@@ -25,17 +32,20 @@ void setup()
     iniciaWifiManager();
     ipAddressTimer.attach(30, ipAddress);
     while(!resWm);
+
     iniciaWebServer();
 
+    iniciaValores();
+
     server.on("/dataJson", HTTP_GET, [](AsyncWebServerRequest *request) {
-        String json = getJsonData(String(PMU.getSystemVoltage()));
+        String json = JSON.stringify(dataJson);
         request->send(200, "application/json", json);
         json = String();
     });
-
 }
 
 void loop()
 {
-    loopGetDataJson(String(PMU.getSystemVoltage()));
+    
+    ws.cleanupClients();
 }

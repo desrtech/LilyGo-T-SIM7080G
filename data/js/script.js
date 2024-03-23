@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", generaSystemVoltage);
 // window.addEventListener('load', getReadings);
 
 var systemVoltageGauge;
+var gateway = 'ws://${windows.location.hostname}/ws';
+var websocket;
+window.addEventListener('load', onLoad);
 
 function generaSystemVoltage() {
     // Create Humidity Gauge
@@ -61,46 +64,76 @@ function generaSystemVoltage() {
 };
 
 // Function to get current readings on the webpage when it loads for the first time
-function getReadings(){
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        var myObj = JSON.parse(this.responseText);
-        var systemVoltage = myObj.systemVoltage;
-        systemVoltageGauge.value = systemVoltage;
-      }
-    }; 
-    xhr.open("GET", "/dataJson", true);
-    xhr.send();
+// function getReadings(){
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function() {
+//       if (this.readyState == 4 && this.status == 200) {
+//         var myObj = JSON.parse(this.responseText);
+//         var systemVoltage = myObj.system_voltage;
+//         systemVoltageGauge.value = systemVoltage;
+//       }
+//     }; 
+//     xhr.open("GET", "/dataJson", true);
+//     xhr.send();
+// };
+
+function onLoad(event) {
+    console.log("On Load Function", event);
+    initWebSocket();
+}
+
+function getReadings() {
+    websocket.send("getReading");
+}
+
+function onOpen() {
+    console.log("On Open Function");
+}
+
+function onClose() {
+    console.log("Connection close");
+    setTimeout(initWebSocket, 2000);
+}
+
+function onMessage() {
+    console.log("Procesa mensajes recibidos");
+}
+
+function initWebSocket() {
+    console.log('Trying to open a Websocket connection...');
+    websocket = new WebSocket(gateway);
+    websocket.onopen = onOpen;
+    websocket.onclose = onClose;
+    websocket.onmessage = onMessage;
 }
 
 
-if (!!window.EventSource) {
-  console.log("Windows event source");
-  var source = new EventSource("/events");
+// if (!!window.EventSource) {
+//   console.log("Windows event source");
+//   var source = new EventSource("/events");
   
-  source.addEventListener("open", function(e) {
-    console.log("Events Connected");
-  }, false);
+//   source.addEventListener("open", function(e) {
+//     console.log("Events Connected");
+//   }, false);
 
-  source.addEventListener("error", function(e) {
-    if (e.target.readyState != EventSource.OPEN) {
-      console.log("Events Disconnected");
-    }
-  }, false);
+//   source.addEventListener("error", function(e) {
+//     if (e.target.readyState != EventSource.OPEN) {
+//       console.log("Events Disconnected");
+//     }
+//   }, false);
 
-  source.addEventListener("message", function(e) {
-    console.log("message", e.data);
-  }, false);
+//   source.addEventListener("message", function(e) {
+//     console.log("message", e.data);
+//   }, false);
 
-  source.addEventListener("ping", function(e) {
-    console.log("Ping Mesage");
-  }, false);
+//   source.addEventListener("ping", function(e) {
+//     console.log("Ping Mesage");
+//   }, false);
 
-  source.addEventListener("new_readings", function(e) {
-    console.log("new_readings", e.data);
-    var myObj = JSON.parse(e.data);
-    console.log(myObj);
-    systemVoltageGauge.value = myObj.systemVoltage;
-  }, false);
-}
+//   source.addEventListener("new_readings", function(e) {
+//     console.log("new_readings", e.data);
+//     var myObj = JSON.parse(e.data);
+//     console.log(myObj);
+//     systemVoltageGauge.value = myObj.systemVoltage;
+//   }, false);
+// }
