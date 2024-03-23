@@ -84,12 +84,6 @@ void iniciaWebServer() {
         request->send(SPIFFS, "/img/favicon.ico", "image/x-icon");
     });
 
-    // server.on("/dataJson", HTTP_GET, [](AsyncWebServerRequest *request) {
-    //     String json = getJsonData();
-    //     request->send(200, "application/json", json);
-    //     json = String();
-    // });
-
     // events.onConnect([](AsyncEventSourceClient *client){
     //     if(client->lastId()){
     //         Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
@@ -98,6 +92,15 @@ void iniciaWebServer() {
     //     // and set reconnect delay to 1 second
     //     client->send("hello!", NULL, millis(), 10000);
     // });
+
+    events.onConnect([](AsyncEventSourceClient *client){
+        if(client->lastId()){
+            Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
+        }
+        // send event with message "hello!", id current millis
+        // and set reconnect delay to 1 second
+        client->send("hello!", NULL, millis(), 10000);
+    });
 
     // server.addHandler(&events);
 

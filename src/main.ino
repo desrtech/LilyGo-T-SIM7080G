@@ -25,7 +25,7 @@ void setup()
     Serial.println("Serial connected");
 
     iniciaXPowers();
-    PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_1HZ);
+    
     chargerIrqStatusTimer.attach(1, irqStatus);
     powerStatusTimer.attach(30, powerStatus);
 
@@ -42,6 +42,7 @@ void setup()
         request->send(200, "application/json", json);
         json = String();
     });
+    PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_4HZ);
 }
 
 void loop()
