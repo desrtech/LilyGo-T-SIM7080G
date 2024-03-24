@@ -4,7 +4,7 @@
 #include <SPIFFS.h>
 #include <Arduino_JSON.h>
 
-AsyncWebServer server(8090);
+AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 
 JSONVar dataJson;
@@ -14,39 +14,57 @@ unsigned long lastTime = 0;
 unsigned long timerDelay = 10000;
 
 // Create an Event Source on /events
-AsyncEventSource events("/events");
+// AsyncEventSource events("/events");
 
 void notifyClients() {
+    Serial.println("Notifica a los clientes");
     ws.textAll(JSON.stringify(dataJson));
+}
+
+void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
+  AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  Serial.println("manejo del WebSocket");
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    //data[len] = 0;
+    //String message = (char*)data;
+    // Check if the message is "getReadings"
+    //if (strcmp((char*)data, "getReadings") == 0) {
+      //if it is, send current sensor readings
+      String sensorReadings = JSON.stringify(dataJson);
+      Serial.print(sensorReadings);
+      notifyClients();
+    //}
+  }
 }
 
 void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType type,
  void *arg, uint8_t *data, size_t len) {
-  switch (type) {
-    case WS_EVT_CONNECT:
-      Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
-      break;
-    case WS_EVT_DISCONNECT:
-      Serial.printf("WebSocket client #%u disconnected\n", client->id());
-      break;
-    case WS_EVT_DATA:
-        Serial.println("Recibiendo datos desde web");
-    //   handleWebSocketMessage(arg, data, len);
-      break;
-    case WS_EVT_PONG:
-    case WS_EVT_ERROR:
-      break;
-  }
+    Serial.println("onEvent Function");
+    switch (type) {
+        case WS_EVT_CONNECT:
+            Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+            break;
+        case WS_EVT_DISCONNECT:
+            Serial.printf("WebSocket client #%u disconnected\n", client->id());
+            break;
+        case WS_EVT_DATA:
+            Serial.println("Recibiendo datos desde web");
+            handleWebSocketMessage(arg, data, len);
+            break;
+        case WS_EVT_PONG:
+        case WS_EVT_ERROR:
+            break;
+    }
 }
 
 void initWebSocket() {
-  ws.onEvent(onEvent);
-  server.addHandler(&ws);
+    Serial.println("InitWebSocket Function");
+    ws.onEvent(onEvent);
+    server.addHandler(&ws);
 }
 
-
-
 void notFound(AsyncWebServerRequest *request) {
+    Serial.println("Not found message");
     request->send(404, "plain/text", "Pagina no encontrada");
 }
 
@@ -66,11 +84,11 @@ void iniciaWebServer() {
         Serial.println("Error al montar SPIFFS");
     }
 
+    initWebSocket();
+
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
             request->send(SPIFFS, "/index.html", "text/html");
     });
-
-    server.serveStatic("/", SPIFFS, "/");
 
     server.on("/css/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/css/styles.css", "text/css");
@@ -83,38 +101,10 @@ void iniciaWebServer() {
     server.on("/img/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/img/favicon.ico", "image/x-icon");
     });
-
-    // events.onConnect([](AsyncEventSourceClient *client){
-    //     if(client->lastId()){
-    //         Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-    //     }
-    //     // send event with message "hello!", id current millis
-    //     // and set reconnect delay to 1 second
-    //     client->send("hello!", NULL, millis(), 10000);
-    // });
-
-    events.onConnect([](AsyncEventSourceClient *client){
-        if(client->lastId()){
-            Serial.printf("Client reconnected! Last message ID that it got is: %u\n", client->lastId());
-        }
-        // send event with message "hello!", id current millis
-        // and set reconnect delay to 1 second
-        client->send("hello!", NULL, millis(), 10000);
-    });
-
-    // server.addHandler(&events);
+    server.serveStatic("/", SPIFFS, "/");
 
     server.onNotFound(notFound);
     server.begin();
 }
 
-// void loopGetDataJson(String systemVoltage) {
-//     if ((millis() - lastTime) > timerDelay) {
-//         Serial.print("Envía datos cada 10s: ");
-//         Serial.println(getJsonData(systemVoltage).c_str());
-//         // events.send("ping", NULL, millis());
-//         events.send(getJsonData(systemVoltage).c_str(),"new_reading" ,millis());
-//         lastTime = millis();
-//     }
-// }
 

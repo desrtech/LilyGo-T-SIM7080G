@@ -5,8 +5,8 @@ document.addEventListener("DOMContentLoaded", generaSystemVoltage);
 // // Get current sensor readings when the page loads  
 // window.addEventListener('load', getReadings);
 
-var systemVoltageGauge;
-var gateway = 'ws://${windows.location.hostname}/ws';
+// var systemVoltageGauge;
+var gateway = 'ws://'+window.location.hostname+'/ws';
 var websocket;
 window.addEventListener('load', onLoad);
 
@@ -16,7 +16,7 @@ function generaSystemVoltage() {
         renderTo: 'system-voltage',
         width: 200,
         height: 200,
-        value: 4.4,
+        value: 1.1,
         units: "V",
         minValue: 4.000,
         startAngle: 90,
@@ -53,7 +53,7 @@ function generaSystemVoltage() {
         renderTo: 'batt-voltage',
         width: 200,
         height: 200,
-        value: 3.3,
+        value: 1.1,
         units: "V",
         minValue: 3,
         startAngle: 90,
@@ -85,7 +85,6 @@ function generaSystemVoltage() {
         animationDuration: 1500,
         animationRule: "linear" 
     }).draw();
-    getReadings();
 };
 
 // Function to get current readings on the webpage when it loads for the first time
@@ -111,17 +110,26 @@ function getReadings() {
     websocket.send("getReading");
 }
 
-function onOpen() {
-    console.log("On Open Function");
+function onOpen(event) {
+    console.log("Connection open", event);
+    getReadings();
 }
 
-function onClose() {
+function onClose(event) {
     console.log("Connection close");
-    setTimeout(initWebSocket, 2000);
+    setTimeout(initWebSocket, 3000);
 }
 
-function onMessage() {
-    console.log("Procesa mensajes recibidos");
+function onMessage(event) {
+    console.log("Procesa mensajes recibidos" + event.data);
+    var data = JSON.parse(event.data);
+
+    systemVoltageGauge.value = data.system_voltage / 1000;
+    battVoltageGauge.value = data.batt_voltage / 1000;
+    document.getElementById('ip_address').innerHTML = data.ip_address;
+    // var systemaVoltage = data.system_voltage;
+    // var battVoltage = data.batt_voltage;
+    // window.addEventListener()
 }
 
 function initWebSocket() {
@@ -130,6 +138,7 @@ function initWebSocket() {
     websocket.onopen = onOpen;
     websocket.onclose = onClose;
     websocket.onmessage = onMessage;
+    console.log(gateway);
 }
 
 
