@@ -121,7 +121,6 @@ function onClose(event) {
 }
 
 function onMessage(event) {
-    console.log("Procesa mensajes recibidos" + event.data);
     var data = JSON.parse(event.data);
 
     systemVoltageGauge.value = data.system_voltage / 1000;

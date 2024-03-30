@@ -16,13 +16,11 @@ void iniciaValores() {
     dataJson["system_voltage"] = PMU.getSystemVoltage();
     dataJson["batt_voltage"] = PMU.getBattVoltage();
     dataJson["ip_address"] = wf.localIP().toString();
-    Serial.print("IniciaValores: "); Serial.println(dataJson["ip_address"]);
+    // Serial.print("IniciaValores: "); Serial.println(dataJson["ip_address"]);
 }
 
 void enviaLecturas() {
-    Serial.println("Envía lecturas");
     iniciaValores();
-    Serial.print(JSON.stringify(dataJson));
     notifyClients();
 }
 

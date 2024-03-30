@@ -17,7 +17,7 @@ unsigned long timerDelay = 10000;
 // AsyncEventSource events("/events");
 
 void notifyClients() {
-    Serial.println("Notifica a los clientes");
+    // Serial.println("Notifica a los clientes");
     ws.textAll(JSON.stringify(dataJson));
 }
 
@@ -101,6 +101,27 @@ void iniciaWebServer() {
     server.on("/img/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/img/favicon.ico", "image/x-icon");
     });
+
+    server.on("css/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "css/bootstrap.min.css", "text/css");
+    });
+
+    server.on("/js/jquery-3.4.1.slim.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/js/jquery-3.4.1.slim.min.js", "application/javascript");
+    });
+
+    server.on("js/popper.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/popper.min.js", "application/javascript");
+    });
+
+    server.on("js/bootstrap.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/bootstrap.min.js", "application/javascript");
+    });
+
+    server.on("js/gauge.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/gauge.min.js", "application/javascript");
+    });
+
     server.serveStatic("/", SPIFFS, "/");
 
     server.onNotFound(notFound);
