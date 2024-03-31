@@ -1,3 +1,7 @@
+.principal {
+    background-color:rgb(37, 28, 95)
+}
+
 .card {
     background-color: #fff;
     border-radius: 10px;
@@ -59,4 +63,8 @@
 .l-bg-cyan {
     background: linear-gradient(135deg, #289cf5, #84c0ec) !important;
     color: #fff;
+}
+
+.mod-xl-1 {
+    width:
 }

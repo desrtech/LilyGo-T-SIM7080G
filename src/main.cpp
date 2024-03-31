@@ -27,8 +27,8 @@ void enviaLecturas() {
 void setup()
 {
     Serial.begin(115200);
-    while (!Serial);
-    delay(3000);
+    
+    delay(10000);
     Serial.println("Serial connected");
 
     iniciaXPowers();
