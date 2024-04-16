@@ -36,6 +36,7 @@ function onMessage(event) {
     document.getElementById('ipAddress').innerHTML = data.ip_address != undefined ? data.ip_address : "127.0.0.1";
     document.getElementById("systemVoltage").innerHTML = data.system_voltage != undefined ? data.system_voltage / 1000 : "5.100";
     document.getElementById("battVoltage").innerHTML = data.batt_voltage != undefined ? data.batt_voltage / 1000 : "3.300";
+    console.log(data.gpsData);
 }
 
 function initWebSocket() {

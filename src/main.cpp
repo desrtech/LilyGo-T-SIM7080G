@@ -3,19 +3,24 @@
 #include <PMUService.h>
 #include <WiFiConnection.h>
 #include <WebServerComponent.h>
+#include <GPSService.h>
 
 Ticker chargeLedBlinkTimer;
 Ticker chargerIrqStatusTimer;
 Ticker powerStatusTimer;
 Ticker ipAddressTimer;
 Ticker actualizacionJsonData;
+Ticker gpsDataPositionTimer;
 
 
-void iniciaValores() {
-    
+void iniciaValores() {    
     dataJson["system_voltage"] = PMU.getSystemVoltage();
     dataJson["batt_voltage"] = PMU.getBattVoltage();
     dataJson["ip_address"] = wf.localIP().toString();
+    // dataJson["gpsData"] = getGpsPositionData();
+
+
+    // Serial.println(JSON.stringify(dataJson["gpsData"]));
     // Serial.print("IniciaValores: "); Serial.println(dataJson["ip_address"]);
 }
 
@@ -41,6 +46,8 @@ void setup()
     while(!resWm);
 
     iniciaWebServer();
+    iniciaGps();
+
 
     iniciaValores();
 
@@ -54,6 +61,8 @@ void setup()
     PMU.setChargingLedMode(XPOWERS_CHG_LED_BLINK_1HZ);
 
     actualizacionJsonData.attach_ms(500, enviaLecturas);
+
+    iniciaGps();
 
 }
 
