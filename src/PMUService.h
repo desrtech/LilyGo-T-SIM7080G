@@ -160,10 +160,10 @@ void irqStatus() {
 
 void powerStatus() {
     Serial.print("Charging:"); Serial.print(PMU.isCharging() ? "YES" : "NO");
-        Serial.print(" VBus Connected: "); Serial.print(PMU.isVbusIn() ? "YES" : "NO");
-        Serial.print(" Batt Voltage: "); Serial.print(PMU.getBattVoltage()); Serial.print("mV");
-        Serial.print(" VBuss Voltage: "); Serial.print(PMU.getVbusVoltage()); Serial.print("mV");
-        Serial.print(" System Voltage: "); Serial.print(PMU.getSystemVoltage()); Serial.print("mV");
+    Serial.print(" VBus Connected: "); Serial.print(PMU.isVbusIn() ? "YES" : "NO");
+    Serial.print(" Batt Voltage: "); Serial.print(PMU.getBattVoltage()); Serial.print("mV");
+    Serial.print(" VBuss Voltage: "); Serial.print(PMU.getVbusVoltage()); Serial.print("mV");
+    Serial.print(" System Voltage: "); Serial.print(PMU.getSystemVoltage()); Serial.print("mV");
 
     // The battery percentage may be inaccurate at first use, the PMU will automatically
     // learn the battery curve and will automatically calibrate the battery percentage

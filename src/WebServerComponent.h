@@ -9,31 +9,23 @@ AsyncWebSocket ws("/ws");
 
 JSONVar dataJson;
 
-// Timer variables
 unsigned long lastTime = 0;
 unsigned long timerDelay = 10000;
-
-// Create an Event Source on /events
-// AsyncEventSource events("/events");
 
 void notifyClients() {
     // Serial.println("Notifica a los clientes");
     ws.textAll(JSON.stringify(dataJson));
 }
 
+void sendClientMessage(String data) {
+    ws.textAll(data);
+}
+
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
-  Serial.println("manejo del WebSocket");
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    //data[len] = 0;
-    //String message = (char*)data;
-    // Check if the message is "getReadings"
-    //if (strcmp((char*)data, "getReadings") == 0) {
-      //if it is, send current sensor readings
       String sensorReadings = JSON.stringify(dataJson);
-      Serial.print(sensorReadings);
       notifyClients();
-    //}
   }
 }
 
@@ -90,24 +82,24 @@ void iniciaWebServer() {
             request->send(SPIFFS, "/index.html", "text/html");
     });
 
-    server.on("/css/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/css/styles.css", "text/css");
+    server.on("css/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "css/styles.css", "text/css");
     });
 
-    server.on("/js/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/js/script.js", "application/javascript");
+    server.on("js/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/script.js", "application/javascript");
     });
 
-    server.on("/img/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/img/favicon.ico", "image/x-icon");
+    server.on("img/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "img/favicon.ico", "image/x-icon");
     });
 
     server.on("css/bootstrap.min.css", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "css/bootstrap.min.css", "text/css");
     });
 
-    server.on("/js/jquery-3.4.1.slim.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->send(SPIFFS, "/js/jquery-3.4.1.slim.min.js", "application/javascript");
+    server.on("js/jquery-3.4.1.slim.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/jquery-3.4.1.slim.min.js", "application/javascript");
     });
 
     server.on("js/popper.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -120,6 +112,22 @@ void iniciaWebServer() {
 
     server.on("js/gauge.min.js", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "js/gauge.min.js", "application/javascript");
+    });
+
+    server.on("js/leaflet.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/leaflet.js", "application/javascript");
+    });
+
+    server.on("css/leaflet.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "css/leaflet.css", "text/css");
+    });
+
+    server.on("js/images/marker-icon.png", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/images/marker-icon.png", "image/png");
+    });
+
+    server.on("js/images/marker-shadow.png", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "js/images/marker-shadow.png", "image/png");
     });
 
     server.serveStatic("/", SPIFFS, "/");

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "utilities.h"
 #include <Arduino_JSON.h>
 
 #define DUMP_AT_COMMANDS
@@ -11,7 +10,7 @@
 #ifdef DUMP_AT_COMMANDS
 #include <StreamDebugger.h>
 StreamDebugger debugger(Serial1, Serial);
-TinyGsm        modem(debugger);
+TinyGsm        tinyGps(debugger);
 #else
 TinyGsm        modem(SerialAT);
 #endif
@@ -39,15 +38,17 @@ void iniciaGps() {
 
     Serial1.begin(112500, SERIAL_8N1, BOARD_MODEM_RXD_PIN, BOARD_MODEM_TXD_PIN);
     pinMode(BOARD_MODEM_PWR_PIN, OUTPUT);
-
+    
     digitalWrite(BOARD_MODEM_PWR_PIN, LOW);
     delay(100);
     digitalWrite(BOARD_MODEM_PWR_PIN, HIGH);
-    delay(1000);
+    delay(100);
     digitalWrite(BOARD_MODEM_PWR_PIN, LOW);
     
     int retry = 0;
-    while(!modem.testAT(1000)) {
+    while(!tinyGps.testAT(1000)) {
+        Serial.print("Serial test AT: "); Serial.println(tinyGps.getModemName());
+        delay(5000);
         Serial.print(".");
         if (retry++ > 15) {
             // Pull down PWRKEY for more than 1 second according to manual requirements
@@ -61,13 +62,15 @@ void iniciaGps() {
         }
     }
     Serial.println();
-    Serial.print("GPS Started");
+    Serial.println("GPS Started");
+    
+    tinyGps.disableGPS();
 
-    modem.disableGPS();
     delay(500);
 
 
     #if 0
+
         /*
         ! GNSS Work Mode Set
         <gps mode> GPS work mode.
@@ -86,8 +89,8 @@ void iniciaGps() {
             1 Start QZSS NMEA out.*/
 
         //GNSS Work Mode Set GPS+BEIDOU
-        modem.sendAT("+CGNSMOD=1,1,0,0,0");
-        modem.waitResponse();
+        tinyGps.sendAT("+CGNSMOD=1,1,0,0,0");
+        tinyGps.waitResponse();
         /*
         GNSS Command,For more parameters, see <SIM7070_SIM7080_SIM7090 Series_AT Command Manual> 212 page.
         <minInterval> range: 1000-60000 ms
@@ -101,16 +104,18 @@ void iniciaGps() {
             3 Only High Accuracy for location is acceptable.
         */
         // minInterval = 1000,minDistance = 0,accuracy = 0
-        modem.sendAT("+SGNSCMD=2,1000,0,0");
-        modem.waitResponse();
+        tinyGps.sendAT("+SGNSCMD=2,1000,0,0");
+        tinyGps.waitResponse();
 
         // Turn off GNSS.
-        modem.sendAT("+SGNSCMD=0");
-        modem.waitResponse();
+        tinyGps.sendAT("+SGNSCMD=0");
+        tinyGps.waitResponse();
     #endif
     delay(500);
+
+    
     // GPS function needs to be enabled for the first use
-    if (modem.enableGPS() == false) {
+    if (tinyGps.enableGPS() == false) {
         Serial.print("Modem enable gps function failed!!");
         while (1) {
             delay(5000);
@@ -120,7 +125,7 @@ void iniciaGps() {
 
 String getGpsPositionData() {
         String gpsPositionData = "";
-        if (modem.getGPS(&lat2, &lon2, &speed2, &alt2, &vsat2, &usat2, &accuracy2,
+        if (tinyGps.getGPS(&lat2, &lon2, &speed2, &alt2, &vsat2, &usat2, &accuracy2,
                      &year2, &month2, &day2, &hour2, &min2, &sec2)) {
             gpsDataJson["latitud"] = String(lat2, 8);
             gpsDataJson["longitud"] = String(lon2, 8);

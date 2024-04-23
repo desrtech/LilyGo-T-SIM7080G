@@ -17,6 +17,12 @@
         <link rel="stylesheet" href="css/styles.css">
         <script src="js/gauge.min.js"></script>
         <!-- <script src="https://cdn.rawgit.com/Mikhus/canvas-gauges/gh-pages/download/2.1.7/all/gauge.min.js"></script> -->
+        <!-- <link rel = "stylesheet" href = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src = "http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script> -->
+
+        <link rel = "stylesheet" href = "css/leaflet.css" />
+        <script src = "js/leaflet.js"></script>
+
         <script src="js/script.js"></script>
     </head>
     <body class="principal">
@@ -82,25 +88,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-4 col-lg-4">
+                            <div class="card l-bg-cherry">
+                                <div class="card-statistic-3 p-4">
+                                    <div class="card-icon card-icon-large"><i class="fas fa-shopping-cart"></i></div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div id="map" style="width: 400px; height: 400px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <!-- <div class="col-md-2">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <p class="text text-center">Right</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 text-center">
-                            <label for="system-voltage">System Voltage</label>
-                            <canvas id="system-voltage"></canvas>
-                        </div>
-                        <div class="col-md-6 text-center">
-                            <label for="batt-voltage">Batt Voltage</label>
-                            <canvas id="batt-voltage"></canvas>
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </body>
