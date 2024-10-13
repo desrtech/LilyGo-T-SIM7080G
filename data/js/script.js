@@ -1,8 +1,7 @@
 var gateway = 'ws://'+window.location.hostname+'/ws';
 var websocket;
 var gpsData;
-var lat = -33.127524858853434;
-var lng = -71.56444467716497;
+
 var map;
 
 function mapView(latitud, longitud) {
@@ -19,10 +18,14 @@ function mapView(latitud, longitud) {
 }
 
 function updateMap(lati, long, map) {
-    console.log("Update map");
-    var marker = new L.Marker([lati, long]);
-    marker.addTo(map);
-    map.panTo(new L.LatLng(lati, long));
+    if (lati && long && map) {
+        console.log("Update map");
+        var marker = new L.Marker([lati, long]);
+        marker.addTo(map);
+        map.panTo(new L.LatLng(lati, long));
+    }
+    
+
     // Assuming you're using a Leaflet map
     // marker = L.marker([lat, lng]);
     // marker.addTo(map);
@@ -39,6 +42,8 @@ window.addEventListener('load', onMessage);
 // document.addEventListener('DOMContentLoaded', onMessage);
 
 function onLoad(event) {
+    var lat = -33.09821927222869;
+    var lng = -71.73812543390552;
     mapView(lat, lng);
     initWebSocket();
     // setTimeout(() => {
@@ -76,7 +81,7 @@ function onMessage(event) {
     var latitud = gpsData.latitud;
     var longitud = gpsData.longitud;
     updateMap(latitud, longitud, map);
-    console.log('On message Latitud: ', lat, ' - Lomgitud: ', lng);
+    console.log('On message Latitud: ', latitud, ' - Lomgitud: ', longitud);
 }
 
 function initWebSocket() {
