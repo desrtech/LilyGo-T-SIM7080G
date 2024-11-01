@@ -10,7 +10,7 @@ void iniciaWifiManager() {
     wf.mode(WIFI_STA);
     
     
-    resWm = wm.autoConnect("AutoConnectAP", "D0v2d@5481");
+    resWm = wm.autoConnect("AutoConnectAP", "D0v2d");
     if(!resWm){
         Serial.println("Failed to connect");
     } else {
