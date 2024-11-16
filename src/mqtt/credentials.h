@@ -1,4 +1,4 @@
-#define FLESPI_TOKEN     "yourflespitoken"
+#define FLESPI_TOKEN     "zBT8ebPxMlh2A7beHhGeTSlMWR27eFgmfRlHkVFR4ZXIfTGziJ3WW3gGUlnZwJv4"
 
 #define MQTT_TOPIC       "hello/world"
 #define MQTT_CLIENT      "CHANGE_IT_TO_UNIQUE" // Please change it to a unique name (two same client_id causes a reconnects)
