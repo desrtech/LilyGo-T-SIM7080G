@@ -202,8 +202,15 @@ void setup()
     PMU.disableDLDO1();
     PMU.disableDLDO2();
 
+    // If it is a power cycle, turn off the modem power. Then restart it
+    if (esp_sleep_get_wakeup_cause() == ESP_SLEEP_WAKEUP_UNDEFINED ) {
+        PMU.disableDC3();
+        // Wait a minute
+        delay(200);
+    }
+
     // ESP32S3 power supply cannot be turned off
-    // PMU.disableDC3();
+    // PMU.disableDC1();
 
     //! Do not turn off BLDO1, which controls the 3.3V power supply for level conversion.
     //! If it is turned off, it will not be able to communicate with the modem normally
@@ -279,7 +286,7 @@ void setup()
     /*********************************
     * step 5 : Wait for the network registration to succeed
     ***********************************/
-    RegStatus s;
+    SIM70xxRegStatus s;
     do {
         s = modem.getRegistrationStatus();
         if (s != REG_OK_HOME && s != REG_OK_ROAMING) {
