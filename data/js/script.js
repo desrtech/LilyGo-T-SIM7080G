@@ -73,15 +73,18 @@ function onMessage(event) {
     } catch (error) {
         data = {};
     }
-    
+    console.log('On message: ', data);
+    document.getElementById('temp').innerHTML = data.temp != undefined ? data.temp : "25.0";
+
     document.getElementById('ipAddress').innerHTML = data.ip_address != undefined ? data.ip_address : "127.0.0.1";
     document.getElementById("systemVoltage").innerHTML = data.system_voltage != undefined ? data.system_voltage / 1000 : "5.100";
     document.getElementById("battVoltage").innerHTML = data.batt_voltage != undefined ? data.batt_voltage / 1000 : "3.300";
+
     gpsData = data.gpsData ? JSON.parse(data.gpsData) : JSON.parse('{"response":"error"}');
     var latitud = gpsData.latitud;
     var longitud = gpsData.longitud;
     updateMap(latitud, longitud, map);
-    console.log('On message Latitud: ', latitud, ' - Lomgitud: ', longitud);
+    // console.log('On message Latitud: ', latitud, ' - Lomgitud: ', longitud);
 }
 
 function initWebSocket() {
